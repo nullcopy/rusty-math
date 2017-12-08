@@ -31,10 +31,16 @@ fn polynomial_division() {
     // Read in denominator
     let d = get_polynomial_coefficients("Denominator coefficients: ");
 
+    // Divide polynomials
+    let (q, r) = divide_polynomials(n, &d);
+
+    // Print result
+    println!("Quotient = {:?}; Remainder = {}", q, r);
+
     // Print polynomial equation
-    print_polynomial(&n);
-    println!("--------");
-    print_polynomial(&d);
+    // print_polynomial(&n);
+    // println!("--------");
+    // print_polynomial(&d);
 }
 
 fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
@@ -63,9 +69,8 @@ fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
         std::process::exit(1);
     }
 
-    // Parse the input string into a reverse ordered vector of coefficients,
-    // with leading zeros removed, and return
-    return s.split_whitespace()
+    // Parse the input string into a reverse ordered vector of coefficients
+    let mut c: Vec<f32> = s.split_whitespace()
         .rev()
         .map(|s| {
             s.parse().unwrap_or_else(|_e| {
@@ -73,8 +78,49 @@ fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
                 std::process::exit(1);
             })
         })
-        .filter(|&x| x != 0.0)
         .collect();
+
+    // Remove trailing zeros
+    for i in (0..c.len()).rev() {
+        if c[i] == 0.0 {
+            c.pop();
+        } else {
+            break;
+        }
+    }
+
+    // Return vector of coefficients
+    return c;
+}
+
+fn divide_polynomials(mut n: Vec<f32>, d: &Vec<f32>) -> (Vec<f32>, f32) {
+    // Make sure numerator is divisible by denominator
+    if d.len() > n.len() {
+        println!("Error: Numerator is not divisible by the denominator!");
+        println!(
+            "The numerator polynomial should be of greater or equal order to the denominator."
+        );
+        std::process::exit(1);
+    }
+
+    // Find the difference in order between the two polynomials
+    let ord_diff = n.len() - d.len();
+
+    // Create vector large enough to hold the quotient
+    let mut q = vec![0.0; ord_diff + 1];
+
+    // Loop over quotient
+    for i in (0..q.len()).rev() {
+        let n_idx = n.len() - 1 - ord_diff + i;
+        q[i] = n[n_idx] / d[d.len() - 1];
+
+        // Loop over denominator
+        for j in 0..d.len() {
+            n[n_idx - j] -= q[i] * d[d.len() - j - 1];
+        }
+    }
+
+    return (q, n[0]);
 }
 
 fn print_polynomial(c: &Vec<f32>) {
