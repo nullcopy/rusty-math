@@ -26,52 +26,27 @@ fn main() {
 
 fn polynomial_division() {
     // Read in numerator
-    let n = get_input("Numerator coefficients: ").unwrap_or_else(|| {
-        println!("Error: Please provide coefficients for the numerator polynomial!");
-        std::process::exit(1);
-    });
-
-    // Parse the numerator into vectors of coefficients
-    let n: Vec<f32> = n.split_whitespace()
-        .map(|s| {
-            s.parse().unwrap_or_else(|_e| {
-                println!("Error: Coefficients must be integer values.");
-                std::process::exit(1);
-            })
-        })
-        .collect();
+    let n: Vec<f32> = get_polynomial("Numerator coefficients: ");
 
     // Read in denominator
-    let d = get_input("Denominator: ").unwrap_or_else(|| {
-        println!("Error: Please provide coefficients for the denominator polynomial!");
-        std::process::exit(1);
-    });
+    let d: Vec<f32> = get_polynomial("Denominator coefficients: ");
 
-    // Parse the denominator into vectors of coefficients
-    let d: Vec<f32> = d.split_whitespace()
-        .map(|s| {
-            s.parse().unwrap_or_else(|_e| {
-                println!("Error: Coefficients must be integer values.");
-                std::process::exit(1);
-            })
-        })
-        .collect();
-
+    // Remove
     // Print polynomial equation
-    for i in 0..(n.len()-2) {
+    for i in 0..(n.len() - 2) {
         print!("{}x^{} + ", n[i], (n.len() - i - 1));
     }
-    print!("{}x + ", n[n.len()-2]);
-    println!("{}", n[n.len()-1]);
+    print!("{}x + ", n[n.len() - 2]);
+    println!("{}", n[n.len() - 1]);
     println!("--------");
-    for i in 0..(d.len()-1) {
+    for i in 0..(d.len() - 2) {
         print!("{}x^{} + ", d[i], (d.len() - i - 1));
     }
-    print!("{}x + ", d[d.len()-2]);
-    println!("{}", d[d.len()-1]);
+    print!("{}x + ", d[d.len() - 2]);
+    println!("{}", d[d.len() - 1]);
 }
 
-fn get_input(msg: &str) -> Option<String> {
+fn get_polynomial(msg: &str) -> Vec<f32> {
     // Input string
     let mut s = String::new();
 
@@ -81,7 +56,7 @@ fn get_input(msg: &str) -> Option<String> {
 
     // Read input
     stdin().read_line(&mut s).expect(
-        "Please enter a numerator!",
+        "Please enter the coefficients of a polynomial!",
     );
 
     // Strip off newline or carriage return characters
@@ -92,9 +67,19 @@ fn get_input(msg: &str) -> Option<String> {
         s.pop();
     }
 
-    if s.len() > 0 {
-        return Some(s);
-    } else {
-        return None;
+    if s.len() <= 0 {
+        println!("Error: Please provide coefficients for the denominator polynomial!");
+        std::process::exit(1);
     }
+
+    // Parse the input string into a reverse ordered vector of coefficients and return
+    return s.split_whitespace()
+        .rev()
+        .map(|s| {
+            s.parse().unwrap_or_else(|_e| {
+                println!("Error: Coefficients must be integer values.");
+                std::process::exit(1);
+            })
+        })
+        .collect();
 }
