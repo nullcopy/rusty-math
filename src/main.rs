@@ -26,27 +26,18 @@ fn main() {
 
 fn polynomial_division() {
     // Read in numerator
-    let n: Vec<f32> = get_polynomial("Numerator coefficients: ");
+    let n = get_polynomial_coefficients("Numerator coefficients: ");
 
     // Read in denominator
-    let d: Vec<f32> = get_polynomial("Denominator coefficients: ");
+    let d = get_polynomial_coefficients("Denominator coefficients: ");
 
-    // Remove
     // Print polynomial equation
-    for i in 0..(n.len() - 2) {
-        print!("{}x^{} + ", n[i], (n.len() - i - 1));
-    }
-    print!("{}x + ", n[n.len() - 2]);
-    println!("{}", n[n.len() - 1]);
+    print_polynomial(&n);
     println!("--------");
-    for i in 0..(d.len() - 2) {
-        print!("{}x^{} + ", d[i], (d.len() - i - 1));
-    }
-    print!("{}x + ", d[d.len() - 2]);
-    println!("{}", d[d.len() - 1]);
+    print_polynomial(&d);
 }
 
-fn get_polynomial(msg: &str) -> Vec<f32> {
+fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
     // Input string
     let mut s = String::new();
 
@@ -72,7 +63,8 @@ fn get_polynomial(msg: &str) -> Vec<f32> {
         std::process::exit(1);
     }
 
-    // Parse the input string into a reverse ordered vector of coefficients and return
+    // Parse the input string into a reverse ordered vector of coefficients,
+    // with leading zeros removed, and return
     return s.split_whitespace()
         .rev()
         .map(|s| {
@@ -81,5 +73,19 @@ fn get_polynomial(msg: &str) -> Vec<f32> {
                 std::process::exit(1);
             })
         })
+        .filter(|&x| x != 0.0)
         .collect();
+}
+
+fn print_polynomial(c: &Vec<f32>) {
+    // Print polynomial from coefficients
+    if c.len() > 2 {
+        for i in (2..c.len()).rev() {
+            print!("{}x^{} + ", c[i], i);
+        }
+    }
+    if c.len() > 1 {
+        print!("{}x + ", c[1]);
+    }
+    println!("{}", c[0]);
 }
