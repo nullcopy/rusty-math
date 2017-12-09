@@ -44,7 +44,6 @@ fn get_input() -> (Result<Ascii85Mode, String>, String) {
 
     // Remove encode/decode command (first two chars) from 
     // the beginning of input string
-    //let input = s.drain(..1).collect();
     let _cmd: String = s.drain(..2).collect();
 
     // Strip off newline or carriage return characters
