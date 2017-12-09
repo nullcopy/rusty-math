@@ -35,12 +35,10 @@ fn polynomial_division() {
     let (q, r) = divide_polynomials(n, &d);
 
     // Print result
-    println!("Quotient = {:?}; Remainder = {}", q, r);
-
-    // Print polynomial equation
-    // print_polynomial(&n);
-    // println!("--------");
-    // print_polynomial(&d);
+    print!("Quotient = ");
+    print_polynomial(&q);
+    print!("Remainder = ");
+    print_polynomial(&r);
 }
 
 fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
@@ -93,14 +91,10 @@ fn get_polynomial_coefficients(msg: &str) -> Vec<f32> {
     return c;
 }
 
-fn divide_polynomials(mut n: Vec<f32>, d: &Vec<f32>) -> (Vec<f32>, f32) {
-    // Make sure numerator is divisible by denominator
+fn divide_polynomials(mut n: Vec<f32>, d: &Vec<f32>) -> (Vec<f32>, Vec<f32>) {
+    // Handle case where denominator is higher order than the numerator
     if d.len() > n.len() {
-        println!("Error: Numerator is not divisible by the denominator!");
-        println!(
-            "The numerator polynomial should be of greater or equal order to the denominator."
-        );
-        std::process::exit(1);
+        return (vec![0.0], n);
     }
 
     // Find the difference in order between the two polynomials
@@ -120,7 +114,16 @@ fn divide_polynomials(mut n: Vec<f32>, d: &Vec<f32>) -> (Vec<f32>, f32) {
         }
     }
 
-    return (q, n[0]);
+    // Remove trailing zeros from remainder
+    for i in (1..n.len()).rev() {
+        if n[i] == 0.0 {
+            n.pop();
+        } else {
+            break;
+        }
+    }
+
+    return (q, n);
 }
 
 fn print_polynomial(c: &Vec<f32>) {
