@@ -19,12 +19,6 @@ pub fn ascii85_codec() {
     };
 
     println!("{}", output);
-    // Debug
-    // match mode {
-    //     Ok(Ascii85Mode::Decode) => println!("Decode: {:?}", input),
-    //     Ok(Ascii85Mode::Encode) => println!("Encode: {:?}", input),
-    //     Err(e) => println!("{}", e),
-    // }
 }
 
 fn get_input() -> (Result<Ascii85Mode, String>, String) {
@@ -67,13 +61,53 @@ fn get_input() -> (Result<Ascii85Mode, String>, String) {
 }
 
 fn ascii85_decode(s: &str) -> String {
-    return String::from("");
+    // Calculate pad amount, such that input is divisible by 5
+    let pad_count = (5 - s.len() % 5) % 5;
+
+    // Split input into bytes, subtract 33
+    let mut rad85: Vec<u8> = s.as_bytes()
+        .iter().map(|x| x - 33).collect();
+    println!("rad85 = {:?}", rad85);
+
+    // Pad input if necessary
+    if pad_count > 0 {
+        rad85.append(&mut vec![b'u' - 33; pad_count]);
+    }
+
+    // Convert to 32b concatenated characters
+    let mut concat: Vec<u32> = Vec::new();
+    for w in rad85.chunks(5) {
+            println!("w = {:?}", w);
+        let mut temp: u32 = w[0] as u32;
+        for i in 1..w.len() {
+            println!("temp = {}", temp);
+            temp *= 85;
+            temp += w[i] as u32;
+        }
+        concat.push(temp);
+    }
+    println!("{:?}", concat);
+
+    // Split into bytes
+    let mut bytes: Vec<u8> = Vec::new();
+    for mut n in concat {
+        // Calculate each of the 4 bytes
+        for _ in 0..4 {
+            bytes.push(((n & 0xFF000000) >> 24)  as u8);
+            n = n << 8;
+        }
+    }
+
+    // Remove padded characters
+    let corrected_length = bytes.len() - pad_count;
+    bytes.truncate(corrected_length);
+
+    return String::from_utf8(bytes).unwrap_or("".to_string());
 }
 
 fn ascii85_encode(s: &str) -> String {
-    // Pad the input string with 0s, so that the length of the
-    // input string is divisible by 4.
-    let pad_count = 4 - s.len() % 4;
+    // Calculate pad amount, such that input is divisible by 4
+    let pad_count = (4 - s.len() % 4) % 4;
 
     // Concatenate bytes into 32 bit numbers (groups of 4)
     let mut nums: Vec<u32> = Vec::new();
