@@ -67,26 +67,20 @@ fn ascii85_decode(s: &str) -> String {
     // Split input into bytes, subtract 33
     let mut rad85: Vec<u8> = s.as_bytes()
         .iter().map(|x| x - 33).collect();
-    println!("rad85 = {:?}", rad85);
 
-    // Pad input if necessary
-    if pad_count > 0 {
-        rad85.append(&mut vec![b'u' - 33; pad_count]);
-    }
+    // Pad with max base85 value
+    rad85.append(&mut vec![84; pad_count]);
 
     // Convert to 32b concatenated characters
     let mut concat: Vec<u32> = Vec::new();
     for w in rad85.chunks(5) {
-            println!("w = {:?}", w);
         let mut temp: u32 = w[0] as u32;
         for i in 1..w.len() {
-            println!("temp = {}", temp);
             temp *= 85;
             temp += w[i] as u32;
         }
         concat.push(temp);
     }
-    println!("{:?}", concat);
 
     // Split into bytes
     let mut bytes: Vec<u8> = Vec::new();
