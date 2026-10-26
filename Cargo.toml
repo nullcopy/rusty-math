@@ -2,7 +2,7 @@
 authors = ["John Boyd <johnboydiv@gmail.com>"]
 name = "rusty-math"
 version = "0.1.0"
-license = "GPL-3.0-or-later"
+license = "AGPL-3.0-or-later"
 
 [dependencies]
 clap = "2.29.0"
